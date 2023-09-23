@@ -1,0 +1,84 @@
+/* Container Styles */
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+/* Chat Box Styles */
+.chat-box {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 10px;
+  margin: 20px auto;
+}
+
+.user-message {
+  text-align: right;
+  background-color: #f1f1f1;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.gpt-message {
+  text-align: left;
+  background-color: #d1e7dd;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* Request Log Styles */
+.request-log {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.request-log h3 {
+  margin-top: 0;
+}
+
+/* Text Input Styles */
+.text-input {
+  margin: auto;
+  max-width: 200px;
+  transform: scale(1.5);
+}
+
+/* TTS Container Styles */
+.tts-container {
+  text-align: center;
+  margin: 20px auto;
+}
+
+/* TTS Button Styles */
+.tts-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 16px; /* Adjust font size */
+}
+
+.tts-button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Audio Player Styles */
+.audio-player {
+  margin-top: 20px;
+}
+
+/* Add more styles as needed */
+
