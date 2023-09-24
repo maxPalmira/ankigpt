@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import axios from "axios";
 import { FaPlay, FaPause, FaStop } from "react-icons/fa";
 
-const apiKey = "d479b77c072654f1f3796e464d84277c";
+const apiKey = process.env.REACT_APP_ELEVENLABS_API_KEY;
 const customVoiceId = "IirqSV9Elx6z4G8seJDT";
 
 const ChatBox = ({ messages }) => {
