@@ -5,22 +5,37 @@ import { FaPlay, FaPause, FaStop } from "react-icons/fa";
 const apiKey = process.env.REACT_APP_ELEVENLABS_API_KEY;
 const customVoiceId = "IirqSV9Elx6z4G8seJDT";
 
-const ChatBox = ({ messages }) => {
+const ChatBox = ({ messages, interacted }) => {
   const messagesEndRef = useRef(null);
   const audioElementsRef = useRef({});
+  const lastMessageRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playingIndex, setPlayingIndex] = useState(-1);
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
+    // Initial set up of lastMessageRef
+    if (!lastMessageRef.current && messages.length) {
+      lastMessageRef.current = messages[messages.length - 1];
+      return; // Exit early on initial render
+    }
+
     const latestMessageIndex = messages.length - 1;
     const latestMessage = messages[latestMessageIndex];
-    const latestAudioElement = audioElementsRef.current[latestMessageIndex];
-    if (latestAudioElement && !latestMessage.startsWith("User:")) {
+
+    if (
+      interacted &&
+      !latestMessage.startsWith("User:") &&
+      latestMessage !== lastMessageRef.current
+    ) {
       requestElevenLabsTTS(latestMessage, latestMessageIndex);
     }
+
+    lastMessageRef.current = latestMessage;
+
+    console.log(messagesEndRef);
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, interacted]);
 
   const handlePlay = (index) => {
     const audioElement = audioElementsRef.current[index];
@@ -115,10 +130,6 @@ const ChatBox = ({ messages }) => {
     }
   };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
   const togglePlayPause = (index) => {
     if (isPlaying && playingIndex === index) {
       pauseAudio();
@@ -169,6 +180,8 @@ const ChatBox = ({ messages }) => {
           ></audio>
         </div>
       ))}
+
+      <div ref={messagesEndRef}></div>
     </div>
   );
 };

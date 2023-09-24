@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ChatBox from './components/ChatBox';
-import TextInput from './components/TextInput';
-import RequestLog from './components/RequestLog';
-import STTComponent from './components/STTComponent'; // Update the path
-import './App.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import ChatBox from "./components/ChatBox";
+import TextInput from "./components/TextInput";
+import RequestLog from "./components/RequestLog";
+import STTComponent from "./components/STTComponent"; // Update the path
+import "./App.css";
 
-
-import MemoryInfo from './components/MemoryInfo';
-
+import MemoryInfo from "./components/MemoryInfo";
 
 const App = () => {
   const [messages, setMessages] = useState([]);
@@ -17,51 +15,47 @@ const App = () => {
   const [includePrevious, setIncludePrevious] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null); // Initialize audioBlob as null
-
+  const [userHasInteracted, setUserHasInteracted] = useState(false);
 
   // Load messages from localStorage when the component mounts
   useEffect(() => {
-    const storedMessages = localStorage.getItem('messages');
+    const storedMessages = localStorage.getItem("messages");
     if (storedMessages) {
       setMessages(JSON.parse(storedMessages));
     }
   }, []);
 
   const countTokens = (text) => {
-      // Split the text by spaces to approximate words
-      const words = text.split(' ');
+    // Split the text by spaces to approximate words
+    const words = text.split(" ");
 
-      // Count tokens (approximation)
-      let tokenCount = 0;
-      for (const word of words) {
-        // Add 1 for the word itself
-        tokenCount += 1;
+    // Count tokens (approximation)
+    let tokenCount = 0;
+    for (const word of words) {
+      // Add 1 for the word itself
+      tokenCount += 1;
 
-        // Add 1 for each punctuation mark
-        tokenCount += (word.match(/[.,!?;:]/g) || []).length;
-      }
+      // Add 1 for each punctuation mark
+      tokenCount += (word.match(/[.,!?;:]/g) || []).length;
+    }
 
-      return tokenCount;
-
+    return tokenCount;
   };
 
-  
-
   const handleSendMessage = (text) => {
-    setIsLoading(true);  // Set loading to true at the start of the function
-
+    setIsLoading(true); // Set loading to true at the start of the function
 
     // Prepare the messages for the API request
-     const apiMessages = [
-    { role: "system", content: "You are a helpful assistant." },
-    ...(includePrevious
-      ? messages.map((message, index) => ({
-          role: index % 2 === 0 ? "user" : "assistant",
-          content: message.split(": ")[1],
-        }))
-      : []),
-    { role: "user", content: text },
-  ];
+    const apiMessages = [
+      { role: "system", content: "You are a helpful assistant." },
+      ...(includePrevious
+        ? messages.map((message, index) => ({
+            role: index % 2 === 0 ? "user" : "assistant",
+            content: message.split(": ")[1],
+          }))
+        : []),
+      { role: "user", content: text },
+    ];
 
     // Count tokens for the entire API request
     const tokenCount = apiMessages.reduce(
@@ -70,26 +64,33 @@ const App = () => {
     );
 
     axios
-      .post("https://api.openai.com/v1/chat/completions", {
-        model: "gpt-4", // Using GPT-4 model
-        messages: apiMessages,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+      .post(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          model: "gpt-4", // Using GPT-4 model
+          messages: apiMessages,
         },
-      })
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+          },
+        }
+      )
       .then((response) => {
         const gptResponse = response.data.choices[0].message.content.trim();
-        const newMessages = [...messages, `User: ${text}`, `GPT-4: ${gptResponse}`];
+        const newMessages = [
+          ...messages,
+          `User: ${text}`,
+          `GPT-4: ${gptResponse}`,
+        ];
         setMessages(newMessages);
         localStorage.setItem("messages", JSON.stringify(newMessages));
 
-        setIsLoading(false);  // Set loading to false when the request is done
+        setIsLoading(false); // Set loading to false when the request is done
       })
       .catch((error) => {
         console.error("Error:", error);
-        setIsLoading(false);  // Set loading to false if an error occurs
+        setIsLoading(false); // Set loading to false if an error occurs
       });
 
     // Update logs
@@ -98,8 +99,9 @@ const App = () => {
       // ... (any other info you want to log)
     };
     setLogs([...logs, newLog]);
-  };
 
+    setUserHasInteracted(true);
+  };
 
   const onStartRecording = () => {
     // Your logic to start recording goes here
@@ -111,11 +113,11 @@ const App = () => {
     setIsRecording(false);
   };
 
-  console.log('app.js', audioBlob)
+  console.log("app.js", audioBlob);
 
   return (
     <div className="container">
-      <ChatBox messages={messages} />
+      <ChatBox messages={messages} interacted={userHasInteracted} />
 
       <div className="settings">
         <label>
@@ -123,7 +125,7 @@ const App = () => {
             type="checkbox"
             checked={includePrevious}
             onChange={() => setIncludePrevious(!includePrevious)}
-          />{' '}
+          />{" "}
           Include Previous Messages
         </label>
       </div>
@@ -132,10 +134,9 @@ const App = () => {
 
       {isLoading ? <div>Loading...</div> : null}
 
-       <STTComponent /> 
-       <RequestLog logs={logs} />
-       <MemoryInfo />
-
+      <STTComponent />
+      <RequestLog logs={logs} />
+      <MemoryInfo />
     </div>
   );
 };
